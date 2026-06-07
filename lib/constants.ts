@@ -27,6 +27,7 @@ export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Réservations', href: '/admin/reservations', icon: '📅' },
   { label: 'Utilisateurs', href: '/admin/utilisateurs', icon: '👥' },
   { label: 'Contenu', href: '/admin/contenu', icon: '✏️' },
+  { label: 'Notifications', href: '/admin/notifications', icon: '📢' },
 ];
 
 // ---------- Reservation ----------
@@ -47,10 +48,15 @@ export const MAX_GUESTS = 12;
 // ---------- Pizza Categories ----------
 
 export const PIZZA_CATEGORIES = [
-  { slug: 'classique', name: 'Classiques', icon: '🍕' },
-  { slug: 'signature', name: 'Signatures', icon: '⭐' },
+  { slug: 'antipasti', name: 'Antipasti & Salades', icon: '🥗' },
+  { slug: 'classique', name: 'Pizzas Classiques', icon: '🍕' },
+  { slug: 'signature', name: 'Pizzas Signatures', icon: '⭐' },
+  { slug: 'pasta', name: 'Pâtes', icon: '🍝' },
+  { slug: 'viande', name: 'Viandes', icon: '🥩' },
+  { slug: 'poisson', name: 'Poissons', icon: '🐟' },
   { slug: 'dessert', name: 'Desserts', icon: '🍰' },
-  { slug: 'boisson', name: 'Boissons', icon: '🥤' },
+  { slug: 'boisson', name: 'Boissons', icon: '☕' },
+  { slug: 'vin', name: 'Carte des Vins', icon: '🍷' },
 ] as const;
 
 // ---------- Loyalty Program ----------

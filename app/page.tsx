@@ -1,65 +1,662 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { motion, useInView } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { PIZZA_CATEGORIES } from '@/lib/constants';
+import { formatPrice } from '@/lib/utils';
+import type { Pizza } from '@/lib/types';
+
+const ANIMATION_DURATION = 0.6;
+
+// Animated word-by-word title
+function AnimatedTitle({ text, className }: { text: string; className?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const words = text.split(' ');
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <h1 ref={ref} className={className} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.3em' }}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: ANIMATION_DURATION, delay: i * 0.08, ease: 'easeOut' }}
+          style={{ display: 'inline-block' }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </h1>
+  );
+}
+
+// Hero Section
+function HeroSection() {
+  return (
+    <section
+      style={{
+        position: 'relative',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        marginTop: 'calc(-1 * var(--header-height))',
+      }}
+    >
+      {/* Background */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'url("https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1920&q=80")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'brightness(0.3)',
+        }}
+      />
+      {/* Gradient overlay */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to bottom, rgba(10,10,8,0.4) 0%, rgba(10,10,8,0.6) 50%, rgba(10,10,8,0.95) 100%)',
+        }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, ease: 'easeOut' }}
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          textAlign: 'center',
+          padding: '0 1.5rem',
+          maxWidth: '800px',
+        }}
+      >
+        {/* Accent text */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-accent"
+          style={{ marginBottom: '1.5rem', fontSize: '0.9rem', letterSpacing: '0.3em' }}
+        >
+          Pizzeria Artisanale — Depuis 2015
+        </motion.p>
+
+        <AnimatedTitle text="Da Enzo" />
+
+        {/* Gold line separator */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          style={{
+            width: '80px',
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, var(--color-gold), transparent)',
+            margin: '1.5rem auto',
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+            color: 'var(--color-text-secondary)',
+            maxWidth: '600px',
+            margin: '0 auto 2.5rem',
+            lineHeight: 1.7,
+          }}
+        >
+          L&apos;art de la pizza artisanale italienne, cuite au feu de bois avec des
+          ingrédients d&apos;exception importés directement d&apos;Italie.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}
+        >
+          <Link href="/reservation" className="btn btn-primary btn-lg">
+            Réserver une table
+          </Link>
+          <Link href="/menu" className="btn btn-secondary btn-lg">
+            Découvrir le menu
+          </Link>
+        </motion.div>
+      </motion.div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 1 }}
+        style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}
+      >
+        <span
+          className="text-accent"
+          style={{ fontSize: '0.65rem', letterSpacing: '0.2em' }}
+        >
+          Scroll
+        </span>
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+          style={{
+            width: '1px',
+            height: '30px',
+            background: 'linear-gradient(to bottom, var(--color-gold), transparent)',
+          }}
+        />
+      </motion.div>
+    </section>
+  );
+}
+
+// Full Menu Section — fetched from Supabase, grouped by category
+function FullMenuSection() {
+  const headerRef = useRef(null);
+  const isInView = useInView(headerRef, { once: true, margin: '-80px' });
+  const [items, setItems] = useState<Pizza[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeSlug, setActiveSlug] = useState('');
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('pizzas')
+        .select('*')
+        .eq('is_available', true)
+        .order('position', { ascending: true });
+      if (data) setItems(data as Pizza[]);
+      setLoading(false);
+    }
+    fetch();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActiveSlug(e.target.id.replace('hcat-', ''));
+        });
+      },
+      { rootMargin: '-20% 0px -75% 0px' }
+    );
+    PIZZA_CATEGORIES.forEach((cat) => {
+      const el = document.getElementById(`hcat-${cat.slug}`);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [loading]);
+
+  useEffect(() => {
+    if (!navRef.current || !activeSlug) return;
+    const btn = navRef.current.querySelector(`[data-slug="${activeSlug}"]`) as HTMLElement | null;
+    if (btn) btn.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+  }, [activeSlug]);
+
+  const grouped = PIZZA_CATEGORIES.reduce<Record<string, Pizza[]>>((acc, cat) => {
+    acc[cat.slug] = items.filter((p) => p.category === cat.slug);
+    return acc;
+  }, {});
+  const available = PIZZA_CATEGORIES.filter((cat) => (grouped[cat.slug]?.length ?? 0) > 0);
+
+  function scrollTo(slug: string) {
+    const el = document.getElementById(`hcat-${slug}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  return (
+    <section style={{ backgroundColor: 'var(--color-surface)', borderTop: '1px solid var(--color-border)' }}>
+      {/* Section header */}
+      <div ref={headerRef} className="section" style={{ paddingBottom: '2rem' }}>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: ANIMATION_DURATION }}
+          className="section-subtitle"
+        >
+          Nos Créations
+        </motion.p>
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: ANIMATION_DURATION, delay: 0.1 }}
+          className="section-title gold-underline"
+          style={{ display: 'inline-block' }}
+        >
+          La Carte
+        </motion.h2>
+      </div>
+
+      {/* Category nav */}
+      {!loading && available.length > 0 && (
+        <div
+          style={{
+            position: 'sticky',
+            top: 'var(--header-height)',
+            zIndex: 10,
+            backgroundColor: 'rgba(17, 17, 16, 0.97)',
+            backdropFilter: 'blur(12px)',
+            borderBottom: '1px solid var(--color-border)',
+            padding: '0.6rem 0',
+          }}
+        >
+          <div
+            ref={navRef}
+            style={{
+              maxWidth: '1200px',
+              margin: '0 auto',
+              padding: '0 1.5rem',
+              display: 'flex',
+              gap: '0.5rem',
+              overflowX: 'auto',
+              scrollbarWidth: 'none',
+            }}
+          >
+            {available.map((cat) => (
+              <button
+                key={cat.slug}
+                data-slug={cat.slug}
+                onClick={() => scrollTo(cat.slug)}
+                style={{
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  padding: '0.35rem 0.9rem',
+                  fontSize: '0.78rem',
+                  fontFamily: 'var(--font-body)',
+                  borderRadius: '2px',
+                  border: '1px solid',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  backgroundColor: activeSlug === cat.slug ? 'var(--color-gold)' : 'transparent',
+                  color: activeSlug === cat.slug ? '#0A0A08' : 'var(--color-text-secondary)',
+                  borderColor: activeSlug === cat.slug ? 'var(--color-gold)' : 'var(--color-border)',
+                }}
+              >
+                {cat.icon} {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Items by category */}
+      <div className="section" style={{ paddingTop: '3rem' }}>
+        {loading ? (
+          <div className="grid-pizzas">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="card" style={{ padding: '2rem' }}>
+                <div className="skeleton" style={{ height: '180px', marginBottom: '1rem' }} />
+                <div className="skeleton" style={{ height: '20px', width: '60%', marginBottom: '0.5rem' }} />
+                <div className="skeleton" style={{ height: '14px', width: '80%' }} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          available.map((cat) => {
+            const catItems = grouped[cat.slug];
+            const isWine = cat.slug === 'vin';
+            return (
+              <section
+                key={cat.slug}
+                id={`hcat-${cat.slug}`}
+                style={{ scrollMarginTop: 'calc(var(--header-height) + 60px)', marginBottom: '4rem' }}
+              >
+                {/* Category heading */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.75rem' }}>
+                  <span style={{ fontSize: '1.6rem', flexShrink: 0 }}>{cat.icon}</span>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)', margin: 0 }}>
+                    {cat.name}
+                  </h3>
+                  <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, var(--color-gold-muted), transparent)' }} />
+                </div>
+
+                {/* Items */}
+                <div className={isWine ? 'grid-vins' : 'grid-pizzas'}>
+                  {catItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="card"
+                      style={{ padding: 0, overflow: 'hidden' }}
+                    >
+                      {item.image_url && !isWine && cat.slug !== 'boisson' && (
+                        <div style={{ height: '190px', overflow: 'hidden' }}>
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                          />
+                        </div>
+                      )}
+                      {!item.image_url && !isWine && cat.slug !== 'boisson' && (
+                        <div style={{ height: '190px', background: 'var(--color-surface-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem' }}>
+                          {cat.icon}
+                        </div>
+                      )}
+                      <div style={{ padding: isWine ? '0.9rem 1.25rem' : '1.25rem 1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', marginBottom: item.description ? '0.4rem' : 0 }}>
+                          <h4 style={{ fontSize: isWine ? '0.9rem' : '1.1rem', fontFamily: 'var(--font-heading)', margin: 0 }}>
+                            {item.name}
+                          </h4>
+                          <span style={{ fontFamily: 'var(--font-display)', fontSize: isWine ? '1rem' : '1.15rem', color: 'var(--color-gold)', fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                            {formatPrice(item.price)}
+                          </span>
+                        </div>
+                        {item.description && (
+                          <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.55, margin: 0 }}>
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
+          })
+        )}
+      </div>
+    </section>
+  );
+}
+
+// About Preview Section
+function AboutPreview() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+
+  return (
+    <section
+      ref={ref}
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderTop: '1px solid var(--color-border)',
+        borderBottom: '1px solid var(--color-border)',
+      }}
+    >
+      <div className="section">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr',
+            gap: '3rem',
+            alignItems: 'center',
+          }}
+          className="about-grid"
+        >
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          >
+            <p className="section-subtitle" style={{ textAlign: 'left' }}>
+              Notre Histoire
+            </p>
+            <h2 style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+              Une passion née à Naples
+            </h2>
+            <p style={{ fontSize: '1rem', lineHeight: 1.8, marginBottom: '1.5rem' }}>
+              Née de la passion d&apos;Enzo pour les traditions culinaires napolitaines,
+              Da Enzo est bien plus qu&apos;une pizzeria. C&apos;est un voyage gustatif au
+              cœur de l&apos;Italie, où chaque pizza est pétrie à la main avec des farines
+              sélectionnées.
+            </p>
+            <p style={{ fontSize: '1rem', lineHeight: 1.8, marginBottom: '2rem' }}>
+              Notre four à bois, atteignant 450°C, confère à nos pizzas cette croûte
+              croustillante et cette mie aérée qui font notre réputation depuis plus de
+              10 ans à Charenton-le-Pont.
+            </p>
+
+            {/* Values */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+              {['Authenticité', 'Qualité', 'Passion', 'Convivialité'].map((val) => (
+                <span key={val} className="badge badge-gold">
+                  {val}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      <style jsx global>{`
+        @media (min-width: 768px) {
+          .about-grid {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+// Stats Section — Animated counters
+function StatsSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+
+  const stats = [
+    { value: 10, suffix: '+', label: 'Années d\'expérience' },
+    { value: 150, suffix: '+', label: 'Pizzas par jour' },
+    { value: 15000, suffix: '+', label: 'Clients satisfaits' },
+    { value: 100, suffix: '%', label: 'Ingrédients italiens' },
+  ];
+
+  return (
+    <section ref={ref} className="section">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '2rem',
+          textAlign: 'center',
+        }}
+      >
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: ANIMATION_DURATION, delay: i * 0.1 }}
+          >
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.5, delay: i * 0.1 + 0.3 }}
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                fontWeight: 300,
+                color: 'var(--color-gold)',
+                textShadow: 'var(--shadow-gold)',
+                display: 'block',
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <CountUp target={stat.value} isInView={isInView} />
+              {stat.suffix}
+            </motion.span>
+            <p
+              style={{
+                fontFamily: 'var(--font-accent)',
+                fontSize: '0.8rem',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                color: 'var(--color-text-secondary)',
+                marginTop: '0.5rem',
+              }}
             >
-              Learning
-            </a>{" "}
-            center.
+              {stat.label}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Counter animation
+function CountUp({ target, isInView }: { target: number; isInView: boolean }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const hasAnimated = useRef(false);
+
+  if (isInView && !hasAnimated.current && typeof window !== 'undefined') {
+    hasAnimated.current = true;
+    const duration = 2000;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(eased * target);
+
+      if (ref.current) {
+        ref.current.textContent = current.toLocaleString('fr-FR');
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }
+
+  return <span ref={ref}>0</span>;
+}
+
+// CTA Section
+function CTASection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+
+  return (
+    <section
+      ref={ref}
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderTop: '1px solid var(--color-border)',
+      }}
+    >
+      <div className="section" style={{ textAlign: 'center' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <p className="section-subtitle">Réservation</p>
+          <h2
+            className="section-title"
+            style={{ marginBottom: '1.5rem' }}
+          >
+            Votre table vous attend
+          </h2>
+          <p
+            style={{
+              fontSize: '1.05rem',
+              color: 'var(--color-text-secondary)',
+              maxWidth: '500px',
+              margin: '0 auto 2.5rem',
+              lineHeight: 1.7,
+            }}
+          >
+            Réservez en quelques clics et laissez-nous vous offrir une expérience
+            gastronomique inoubliable.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          <Link href="/reservation" className="btn btn-primary btn-lg">
+            Réserver maintenant
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================
+// Main Page Component
+// ============================================================
+export default function HomePage() {
+  return (
+    <>
+      <HeroSection />
+
+      {/* Art Deco Separator */}
+      <div className="separator" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <span className="separator-ornament">◆</span>
+      </div>
+
+      <FullMenuSection />
+
+      <AboutPreview />
+
+      <StatsSection />
+
+      {/* Art Deco Separator */}
+      <div className="separator" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <span className="separator-ornament">◆</span>
+      </div>
+
+      <CTASection />
+
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Restaurant',
+            name: 'Da Enzo Pizza',
+            description: 'Pizzeria artisanale italienne à Charenton-le-Pont. Pizzas cuites au feu de bois.',
+            image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&q=80',
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: '12 Rue de Paris',
+              addressLocality: 'Charenton-le-Pont',
+              postalCode: '94220',
+              addressCountry: 'FR',
+            },
+            telephone: '+33143680000',
+            servesCuisine: 'Italian',
+            priceRange: '€€',
+            openingHoursSpecification: [
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '11:30', closes: '22:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Wednesday', opens: '11:30', closes: '22:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Thursday', opens: '11:30', closes: '22:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Friday', opens: '11:30', closes: '23:00' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '11:30', closes: '23:00' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Sunday', opens: '11:30', closes: '22:00' },
+            ],
+          }),
+        }}
+      />
+    </>
   );
 }

@@ -8,7 +8,7 @@ export interface Profile {
   id: string;
   email: string;
   full_name: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'disabled';
   points: number;
   created_at: string;
 }
@@ -26,7 +26,7 @@ export interface Pizza {
   updated_at: string;
 }
 
-export type PizzaCategory = 'classique' | 'signature' | 'dessert' | 'boisson';
+export type PizzaCategory = 'classique' | 'signature' | 'antipasti' | 'pasta' | 'viande' | 'poisson' | 'dessert' | 'boisson' | 'vin';
 
 export interface CategoryMenu {
   id: string;
