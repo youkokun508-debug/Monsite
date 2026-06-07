@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { PublicShell } from "@/components/layout/PublicShell";
 
 export const metadata: Metadata = {
   title: {
@@ -36,11 +35,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body>
-        <Header />
-        <main style={{ minHeight: "calc(100vh - var(--header-height))" }}>
-          {children}
-        </main>
-        <Footer />
+        <PublicShell>{children}</PublicShell>
       </body>
     </html>
   );
