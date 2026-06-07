@@ -499,8 +499,8 @@ function ReviewsSection() {
           {/* Rating summary */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginTop: '1.25rem' }}>
             <span style={{ color: 'var(--color-gold)', fontSize: '1.3rem', letterSpacing: '2px' }}>★★★★★</span>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--color-gold)' }}>5.0</span>
-            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>· 12 avis Google</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--color-gold)' }}>4,8</span>
+            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>· 131 avis Google</span>
           </div>
         </motion.div>
 
