@@ -16,7 +16,7 @@ export function Footer() {
           maxWidth: '1200px',
           margin: '0 auto',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: '3rem',
         }}
       >
@@ -43,7 +43,7 @@ export function Footer() {
               fontSize: '0.9rem',
               color: 'var(--color-text-secondary)',
               lineHeight: 1.7,
-              maxWidth: '300px',
+              maxWidth: '280px',
             }}
           >
             L&apos;art de la pizza artisanale italienne depuis 2015. Chaque pizza est une
@@ -114,18 +114,24 @@ export function Footer() {
               color: 'var(--color-text-secondary)',
             }}
           >
-            <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ color: 'var(--color-gold)' }}>📍</span>
-              12 Rue de Paris, 94220 Charenton-le-Pont
+            <p style={{ margin: 0, display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+              <span style={{ color: 'var(--color-gold)', flexShrink: 0 }}>📍</span>
+              4 Rue de Paris, 94220 Charenton-le-Pont
             </p>
-            <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <a
+              href="tel:+33149760570"
+              style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', textDecoration: 'none' }}
+            >
               <span style={{ color: 'var(--color-gold)' }}>📞</span>
-              01 43 68 XX XX
-            </p>
-            <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              01 49 76 05 70
+            </a>
+            <a
+              href="mailto:info@daenzopizzeria.fr"
+              style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', textDecoration: 'none' }}
+            >
               <span style={{ color: 'var(--color-gold)' }}>✉️</span>
-              contact@daenzopizza.fr
-            </p>
+              info@daenzopizzeria.fr
+            </a>
           </div>
         </div>
 
@@ -153,21 +159,16 @@ export function Footer() {
               color: 'var(--color-text-secondary)',
             }}
           >
-            <p style={{ margin: 0 }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Lun</span> — Fermé
-            </p>
-            <p style={{ margin: 0 }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Mar-Jeu</span> — 11h30-14h / 18h30-22h30
-            </p>
-            <p style={{ margin: 0 }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Ven</span> — 11h30-14h / 18h30-23h
-            </p>
-            <p style={{ margin: 0 }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Sam</span> — 11h30-23h
-            </p>
-            <p style={{ margin: 0 }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Dim</span> — 11h30-22h
-            </p>
+            {[
+              { days: 'Lun – Sam', hours: '12h00 – 14h30 / 19h00 – 23h00' },
+              { days: 'Dimanche', hours: '19h00 – 23h00' },
+            ].map(({ days, hours }) => (
+              <p key={days} style={{ margin: 0 }}>
+                <span style={{ color: 'var(--color-text-muted)' }}>{days}</span>
+                {' — '}
+                {hours}
+              </p>
+            ))}
           </div>
         </div>
       </div>
@@ -192,8 +193,7 @@ export function Footer() {
           © {currentYear} Da Enzo Pizza. Tous droits réservés.
         </p>
         <p style={{ margin: 0 }}>
-          Réalisé avec ♥ par{' '}
-          <span style={{ color: 'var(--color-gold)' }}>Antigravity</span>
+          4 Rue de Paris · 94220 Charenton-le-Pont
         </p>
       </div>
     </footer>
