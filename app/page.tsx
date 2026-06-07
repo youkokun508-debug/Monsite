@@ -457,6 +457,120 @@ function AboutPreview() {
   );
 }
 
+// Reviews Section
+const REVIEWS = [
+  { name: 'Ari Gozlan', text: 'Meilleur pizza de Charenton, c\'est extraordinaire !' },
+  { name: 'Cyril E.', text: 'Les 4 fromages et le tiramisu étaient parfaits. Une adresse qu\'on a plaisir à retrouver.' },
+  { name: 'Christoo Hunders', text: 'Goûté une Régina et une végétarienne qui était exquise. Je recommande vraiment.' },
+  { name: 'Ludovic Thomas', text: 'Belle découverte ! La pâte est légère, les ingrédients frais, le cadre agréable.' },
+  { name: 'Donovane Amelin', text: 'Super accueil, service très rapide et pizza délicieuse. On reviendra !' },
+  { name: 'Marya Loam', text: 'Merci à Sam, c\'était super bon comme toujours. La meilleure pizzeria du quartier.' },
+  { name: 'Ouadhen Safa', text: 'Super accueil, le repas était excellent ! Une vraie adresse de qualité.' },
+  { name: 'Cristiano Fernandes', text: 'Patron très sympathique, bonne musique, pizza et dessert au top. Une excellente soirée.' },
+  { name: 'Lucas Fernandes', text: 'Pizzas excellentes et personnel gentil. Je recommande chaudement.' },
+  { name: 'Caroline Gallais', text: 'Personnel gentil et accueillant, plats délicieux. Une belle découverte à Charenton.' },
+  { name: 'Anthony Poivet', text: 'Super bien, super génial, très satisfait ! On y retourne très bientôt.' },
+  { name: 'Yacoub Jack', text: 'Très bien, je recommande. Qualité irréprochable et service au top.' },
+];
+
+function ReviewsSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+
+  return (
+    <section
+      ref={ref}
+      style={{
+        backgroundColor: 'var(--color-bg)',
+        borderTop: '1px solid var(--color-border)',
+      }}
+    >
+      <div className="section">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: ANIMATION_DURATION }}
+          style={{ textAlign: 'center', marginBottom: '3rem' }}
+        >
+          <p className="section-subtitle">Ils nous font confiance</p>
+          <h2 className="section-title gold-underline" style={{ display: 'inline-block' }}>
+            Avis Clients
+          </h2>
+          {/* Rating summary */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginTop: '1.25rem' }}>
+            <span style={{ color: 'var(--color-gold)', fontSize: '1.3rem', letterSpacing: '2px' }}>★★★★★</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--color-gold)' }}>5.0</span>
+            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>· 12 avis Google</span>
+          </div>
+        </motion.div>
+
+        {/* Reviews grid */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1.25rem',
+          }}
+        >
+          {REVIEWS.map((review, i) => (
+            <motion.div
+              key={review.name}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: Math.min(i * 0.07, 0.5) }}
+              className="card"
+              style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            >
+              {/* Stars */}
+              <span style={{ color: 'var(--color-gold)', fontSize: '0.9rem', letterSpacing: '2px' }}>
+                ★★★★★
+              </span>
+
+              {/* Quote */}
+              <p
+                style={{
+                  fontSize: '0.9rem',
+                  lineHeight: 1.7,
+                  color: 'var(--color-text-secondary)',
+                  margin: 0,
+                  flex: 1,
+                  fontStyle: 'italic',
+                }}
+              >
+                &ldquo;{review.text}&rdquo;
+              </p>
+
+              {/* Reviewer */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--color-gold-dark), var(--color-gold-muted))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: 'var(--color-text-primary)',
+                    flexShrink: 0,
+                  }}
+                >
+                  {review.name.charAt(0)}
+                </div>
+                <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                  {review.name}
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Stats Section — Animated counters
 function StatsSection() {
   const ref = useRef(null);
@@ -616,6 +730,8 @@ export default function HomePage() {
       <FullMenuSection />
 
       <AboutPreview />
+
+      <ReviewsSection />
 
       <StatsSection />
 
