@@ -667,15 +667,36 @@ function CountUp({ target, isInView }: { target: number; isInView: boolean }) {
   return <span ref={ref}>0</span>;
 }
 
+const MAP_DAYS = [
+  { key: 'hours_mon', label: 'Lundi' },
+  { key: 'hours_tue', label: 'Mardi' },
+  { key: 'hours_wed', label: 'Mercredi' },
+  { key: 'hours_thu', label: 'Jeudi' },
+  { key: 'hours_fri', label: 'Vendredi' },
+  { key: 'hours_sat', label: 'Samedi' },
+  { key: 'hours_sun', label: 'Dimanche' },
+];
+
 // Map Section
 function MapSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
   const supabase = createClient();
-  const [contact, setContact] = useState({ address: '4 Rue de Paris, 94220 Charenton-le-Pont', phone: '01 49 76 05 70' });
+  const [contact, setContact] = useState<Record<string, string>>({
+    address: '4 Rue de Paris, 94220 Charenton-le-Pont',
+    phone: '01 49 76 05 70',
+    hours_mon: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_tue: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_wed: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_thu: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_fri: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_sat: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_sun: '18h30 – 23h00',
+  });
 
   useEffect(() => {
-    supabase.from('site_content').select('key,value').in('key', ['address', 'phone']).then(({ data }) => {
+    const keys = ['address', 'phone', ...MAP_DAYS.map((d) => d.key)];
+    supabase.from('site_content').select('key,value').in('key', keys).then(({ data }) => {
       if (data?.length) {
         const m: Record<string, string> = {};
         data.forEach((r) => { m[r.key] = r.value; });
@@ -724,13 +745,10 @@ function MapSection() {
             <div>
               <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.6rem' }}>Horaires</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                {[
-                  { j: 'Dimanche', h: '18h30 – 23h00' },
-                  { j: 'Lun – Sam', h: '12h00 – 14h30 / 18h30 – 23h00' },
-                ].map(({ j, h }) => (
-                  <div key={j} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', fontSize: '0.8rem' }}>
-                    <span style={{ color: 'var(--color-text-secondary)', flexShrink: 0 }}>{j}</span>
-                    <span style={{ color: 'var(--color-text-primary)', textAlign: 'right' }}>{h}</span>
+                {MAP_DAYS.map(({ key, label }) => (
+                  <div key={key} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', fontSize: '0.8rem' }}>
+                    <span style={{ color: 'var(--color-text-secondary)', flexShrink: 0 }}>{label}</span>
+                    <span style={{ color: contact[key] === 'Fermé' ? 'var(--color-text-muted)' : 'var(--color-text-primary)', textAlign: 'right' }}>{contact[key] || '—'}</span>
                   </div>
                 ))}
               </div>
