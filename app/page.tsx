@@ -320,7 +320,7 @@ function FullMenuSection() {
         ) : (
           available.map((cat) => {
             const catItems = grouped[cat.slug];
-            const isWine = cat.slug === 'vin';
+            const isWine = cat.slug === 'vin' || cat.slug === 'cafe' || cat.slug === 'bambino';
             return (
               <section
                 key={cat.slug}
@@ -344,7 +344,7 @@ function FullMenuSection() {
                       className="card"
                       style={{ padding: 0, overflow: 'hidden' }}
                     >
-                      {item.image_url && !isWine && cat.slug !== 'boisson' && (
+                      {item.image_url && !isWine && (
                         <div style={{ height: '190px', overflow: 'hidden' }}>
                           <img
                             src={item.image_url}
@@ -355,7 +355,7 @@ function FullMenuSection() {
                           />
                         </div>
                       )}
-                      {!item.image_url && !isWine && cat.slug !== 'boisson' && (
+                      {!item.image_url && !isWine && (
                         <div style={{ height: '190px', background: 'var(--color-surface-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem' }}>
                           {cat.icon}
                         </div>
