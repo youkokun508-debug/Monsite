@@ -48,15 +48,19 @@ export const MAX_GUESTS = 12;
 // ---------- Pizza Categories ----------
 
 export const PIZZA_CATEGORIES = [
-  { slug: 'antipasti', name: 'Antipasti & Salades', icon: '🥗' },
-  { slug: 'classique', name: 'Pizzas Classiques', icon: '🍕' },
-  { slug: 'signature', name: 'Pizzas Signatures', icon: '⭐' },
-  { slug: 'pasta', name: 'Pâtes', icon: '🍝' },
-  { slug: 'viande', name: 'Viandes', icon: '🥩' },
-  { slug: 'poisson', name: 'Poissons', icon: '🐟' },
-  { slug: 'dessert', name: 'Desserts', icon: '🍰' },
-  { slug: 'boisson', name: 'Boissons', icon: '☕' },
-  { slug: 'vin', name: 'Carte des Vins', icon: '🍷' },
+  { slug: 'bruschetta', name: 'Bruschettas', icon: '🍞' },
+  { slug: 'antipasti', name: 'Antipasti', icon: '🫙' },
+  { slug: 'insalate', name: 'Insalate', icon: '🥗' },
+  { slug: 'pizza-tomate', name: 'Pizzas Base Tomate', icon: '🍕' },
+  { slug: 'pizza-creme', name: 'Pizzas Base Crème', icon: '🍕' },
+  { slug: 'pasta', name: 'Pastas', icon: '🍝' },
+  { slug: 'carni', name: 'Carni', icon: '🥩' },
+  { slug: 'pescare', name: 'Pescare', icon: '🐟' },
+  { slug: 'gelati', name: 'Gelati', icon: '🍦' },
+  { slug: 'dolci', name: 'Dolci', icon: '🍰' },
+  { slug: 'cafe', name: 'Cafés & Thés', icon: '☕' },
+  { slug: 'vin', name: 'Vins', icon: '🍷' },
+  { slug: 'bambino', name: 'Menu Bambino', icon: '👶' },
 ] as const;
 
 // ---------- Loyalty Program ----------

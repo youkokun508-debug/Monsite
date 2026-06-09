@@ -26,7 +26,7 @@ export interface Pizza {
   updated_at: string;
 }
 
-export type PizzaCategory = 'classique' | 'signature' | 'antipasti' | 'pasta' | 'viande' | 'poisson' | 'dessert' | 'boisson' | 'vin';
+export type PizzaCategory = 'bruschetta' | 'antipasti' | 'insalate' | 'pizza-tomate' | 'pizza-creme' | 'pasta' | 'carni' | 'pescare' | 'gelati' | 'dolci' | 'cafe' | 'vin' | 'bambino';
 
 export interface CategoryMenu {
   id: string;

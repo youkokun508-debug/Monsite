@@ -12,7 +12,7 @@ type Category = typeof PIZZA_CATEGORIES[number];
 function CategorySection({ category, items }: { category: Category; items: Pizza[] }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
-  const isWine = category.slug === 'vin';
+  const isTextOnly = category.slug === 'vin' || category.slug === 'cafe' || category.slug === 'bambino';
 
   return (
     <section
@@ -35,7 +35,7 @@ function CategorySection({ category, items }: { category: Category; items: Pizza
       </motion.div>
 
       {/* Items */}
-      <div className={isWine ? 'grid-vins' : 'grid-pizzas'}>
+      <div className={isTextOnly ? 'grid-vins' : 'grid-pizzas'}>
         {items.map((item, i) => (
           <motion.div
             key={item.id}
@@ -46,7 +46,7 @@ function CategorySection({ category, items }: { category: Category; items: Pizza
             style={{ padding: 0, overflow: 'hidden' }}
           >
             {/* Image — only for food items that have one */}
-            {item.image_url && !isWine && category.slug !== 'boisson' && (
+            {item.image_url && !isTextOnly && (
               <div style={{ height: '200px', overflow: 'hidden' }}>
                 <img
                   src={item.image_url}
@@ -57,7 +57,7 @@ function CategorySection({ category, items }: { category: Category; items: Pizza
                 />
               </div>
             )}
-            {!item.image_url && !isWine && category.slug !== 'boisson' && (
+            {!item.image_url && !isTextOnly && (
               <div
                 style={{
                   height: '200px',
@@ -73,7 +73,7 @@ function CategorySection({ category, items }: { category: Category; items: Pizza
             )}
 
             {/* Content */}
-            <div style={{ padding: isWine ? '1rem 1.25rem' : '1.5rem' }}>
+            <div style={{ padding: isTextOnly ? '1rem 1.25rem' : '1.5rem' }}>
               <div
                 style={{
                   display: 'flex',
@@ -85,7 +85,7 @@ function CategorySection({ category, items }: { category: Category; items: Pizza
               >
                 <h3
                   style={{
-                    fontSize: isWine ? '0.95rem' : '1.15rem',
+                    fontSize: isTextOnly ? '0.95rem' : '1.15rem',
                     fontFamily: 'var(--font-heading)',
                     margin: 0,
                     color: 'var(--color-text-primary)',
@@ -96,7 +96,7 @@ function CategorySection({ category, items }: { category: Category; items: Pizza
                 <span
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: isWine ? '1.05rem' : '1.2rem',
+                    fontSize: isTextOnly ? '1.05rem' : '1.2rem',
                     color: 'var(--color-gold)',
                     fontWeight: 500,
                     whiteSpace: 'nowrap',
@@ -135,11 +135,12 @@ export default function MenuPage() {
   useEffect(() => {
     async function fetchItems() {
       const supabase = createClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('pizzas')
         .select('*')
         .eq('is_available', true)
         .order('position', { ascending: true });
+      if (error) console.error('[Menu] Supabase error:', error.message, error.details);
       if (data) setItems(data as Pizza[]);
       setLoading(false);
     }
