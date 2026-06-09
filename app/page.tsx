@@ -725,15 +725,13 @@ function MapSection() {
               <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.6rem' }}>Horaires</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                 {[
-                  { j: 'Lundi', h: 'Fermé', fermé: true },
-                  { j: 'Mar – Jeu', h: '11h30 – 14h / 18h30 – 22h30' },
-                  { j: 'Vendredi', h: '11h30 – 14h / 18h30 – 23h' },
-                  { j: 'Samedi', h: '11h30 – 23h00' },
-                  { j: 'Dimanche', h: '11h30 – 22h00' },
-                ].map(({ j, h, fermé }) => (
+                  { j: 'Dimanche', h: '18h30 – 23h00' },
+                  { j: 'Lundi', h: '12h00 – 14h30 / 18h30 – 23h30' },
+                  { j: 'Mar – Sam', h: '12h00 – 14h30 / 18h30 – 23h00' },
+                ].map(({ j, h }) => (
                   <div key={j} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', fontSize: '0.8rem' }}>
                     <span style={{ color: 'var(--color-text-secondary)', flexShrink: 0 }}>{j}</span>
-                    <span style={{ color: fermé ? 'var(--color-text-muted)' : 'var(--color-text-primary)', textAlign: 'right' }}>{h}</span>
+                    <span style={{ color: 'var(--color-text-primary)', textAlign: 'right' }}>{h}</span>
                   </div>
                 ))}
               </div>
@@ -862,10 +860,17 @@ export default function HomePage() {
             servesCuisine: 'Italian',
             priceRange: '€€',
             openingHoursSpecification: [
-              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '11:30', closes: '22:30' },
-              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Wednesday', opens: '11:30', closes: '22:30' },
-              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Thursday', opens: '11:30', closes: '22:30' },
-              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Friday', opens: '11:30', closes: '23:00' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Sunday', opens: '18:30', closes: '23:00' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Monday', opens: '12:00', closes: '14:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Monday', opens: '18:30', closes: '23:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '12:00', closes: '14:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '18:30', closes: '23:00' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Wednesday', opens: '12:00', closes: '14:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Wednesday', opens: '18:30', closes: '23:00' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Thursday', opens: '12:00', closes: '14:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Thursday', opens: '18:30', closes: '23:00' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Friday', opens: '12:00', closes: '14:30' },
+              { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Friday', opens: '18:30', closes: '23:00' },
               { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '11:30', closes: '23:00' },
               { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Sunday', opens: '11:30', closes: '22:00' },
             ],

@@ -21,13 +21,13 @@ export default function ContactPage() {
     phone: '01 43 68 XX XX',
     address: '12 Rue de Paris, 94220 Charenton-le-Pont',
     email: 'contact@daenzopizza.fr',
-    hours_mon: 'Fermé',
-    hours_tue: '11h30 – 14h00 / 18h30 – 22h30',
-    hours_wed: '11h30 – 14h00 / 18h30 – 22h30',
-    hours_thu: '11h30 – 14h00 / 18h30 – 22h30',
-    hours_fri: '11h30 – 14h00 / 18h30 – 23h00',
-    hours_sat: '11h30 – 23h00',
-    hours_sun: '11h30 – 22h00',
+    hours_mon: '12h00 – 14h30 / 18h30 – 23h30',
+    hours_tue: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_wed: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_thu: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_fri: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_sat: '12h00 – 14h30 / 18h30 – 23h00',
+    hours_sun: '18h30 – 23h00',
   });
 
   useEffect(() => {
