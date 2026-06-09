@@ -726,8 +726,7 @@ function MapSection() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                 {[
                   { j: 'Dimanche', h: '18h30 – 23h00' },
-                  { j: 'Lundi', h: '12h00 – 14h30 / 18h30 – 23h30' },
-                  { j: 'Mar – Sam', h: '12h00 – 14h30 / 18h30 – 23h00' },
+                  { j: 'Lun – Sam', h: '12h00 – 14h30 / 18h30 – 23h00' },
                 ].map(({ j, h }) => (
                   <div key={j} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', fontSize: '0.8rem' }}>
                     <span style={{ color: 'var(--color-text-secondary)', flexShrink: 0 }}>{j}</span>
