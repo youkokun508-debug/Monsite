@@ -667,6 +667,98 @@ function CountUp({ target, isInView }: { target: number; isInView: boolean }) {
   return <span ref={ref}>0</span>;
 }
 
+// Map Section
+function MapSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+
+  return (
+    <section ref={ref} style={{ padding: 'clamp(3rem, 8vw, 5rem) 0', backgroundColor: 'var(--color-bg)' }}>
+      <div className="section">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          style={{ textAlign: 'center', marginBottom: '3rem' }}
+        >
+          <p className="section-subtitle">Venir nous voir</p>
+          <h2 className="section-title gold-underline" style={{ display: 'inline-block' }}>
+            Nous Trouver
+          </h2>
+        </motion.div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'clamp(220px, 30%, 320px) 1fr',
+          gap: '2.5rem',
+          alignItems: 'stretch',
+        }}>
+          {/* Infos pratiques */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="card"
+            style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}
+          >
+            <div>
+              <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.4rem' }}>Adresse</p>
+              <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-primary)' }}>
+                12 Rue de Paris<br />94220 Charenton-le-Pont
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.4rem' }}>Téléphone</p>
+              <p style={{ fontSize: '0.95rem', color: 'var(--color-text-primary)' }}>01 43 68 XX XX</p>
+            </div>
+            <div>
+              <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.6rem' }}>Horaires</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                {[
+                  { j: 'Lundi', h: 'Fermé', fermé: true },
+                  { j: 'Mar – Jeu', h: '11h30 – 14h / 18h30 – 22h30' },
+                  { j: 'Vendredi', h: '11h30 – 14h / 18h30 – 23h' },
+                  { j: 'Samedi', h: '11h30 – 23h00' },
+                  { j: 'Dimanche', h: '11h30 – 22h00' },
+                ].map(({ j, h, fermé }) => (
+                  <div key={j} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', fontSize: '0.8rem' }}>
+                    <span style={{ color: 'var(--color-text-secondary)', flexShrink: 0 }}>{j}</span>
+                    <span style={{ color: fermé ? 'var(--color-text-muted)' : 'var(--color-text-primary)', textAlign: 'right' }}>{h}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Carte Google Maps */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.25 }}
+            style={{
+              borderRadius: '4px',
+              overflow: 'hidden',
+              border: '1px solid var(--color-border)',
+              minHeight: '380px',
+            }}
+          >
+            <iframe
+              src="https://maps.google.com/maps?q=12+Rue+de+Paris+94220+Charenton-le-Pont+France&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0, display: 'block', minHeight: '380px' }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Localisation Da Enzo"
+            />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // CTA Section
 function CTASection() {
   const ref = useRef(null);
@@ -739,6 +831,8 @@ export default function HomePage() {
       <div className="separator" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <span className="separator-ornament">◆</span>
       </div>
+
+      <MapSection />
 
       <CTASection />
 
