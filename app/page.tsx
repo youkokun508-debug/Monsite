@@ -671,6 +671,18 @@ function CountUp({ target, isInView }: { target: number; isInView: boolean }) {
 function MapSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const supabase = createClient();
+  const [contact, setContact] = useState({ address: '4 Rue de Paris, 94220 Charenton-le-Pont', phone: '01 49 76 05 70' });
+
+  useEffect(() => {
+    supabase.from('site_content').select('key,value').in('key', ['address', 'phone']).then(({ data }) => {
+      if (data?.length) {
+        const m: Record<string, string> = {};
+        data.forEach((r) => { m[r.key] = r.value; });
+        setContact((p) => ({ ...p, ...m }));
+      }
+    });
+  }, []);
 
   return (
     <section ref={ref} style={{ padding: 'clamp(3rem, 8vw, 5rem) 0', backgroundColor: 'var(--color-bg)' }}>
@@ -703,13 +715,11 @@ function MapSection() {
           >
             <div>
               <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.4rem' }}>Adresse</p>
-              <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-primary)' }}>
-                12 Rue de Paris<br />94220 Charenton-le-Pont
-              </p>
+              <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-primary)' }}>{contact.address}</p>
             </div>
             <div>
               <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.4rem' }}>Téléphone</p>
-              <p style={{ fontSize: '0.95rem', color: 'var(--color-text-primary)' }}>01 43 68 XX XX</p>
+              <a href={`tel:${contact.phone.replace(/\s/g, '')}`} style={{ fontSize: '0.95rem', color: 'var(--color-text-primary)', textDecoration: 'none' }}>{contact.phone}</a>
             </div>
             <div>
               <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.6rem' }}>Horaires</p>
@@ -730,27 +740,22 @@ function MapSection() {
             </div>
           </motion.div>
 
-          {/* Carte Google Maps */}
+          {/* Carte Google Maps — même style sombre que la page Contact */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.25 }}
-            style={{
-              borderRadius: '4px',
-              overflow: 'hidden',
-              border: '1px solid var(--color-border)',
-              minHeight: '380px',
-            }}
+            style={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--color-border)', minHeight: '380px' }}
           >
             <iframe
-              src="https://maps.google.com/maps?q=12+Rue+de+Paris+94220+Charenton-le-Pont+France&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              src="https://maps.google.com/maps?q=Da+Enzo+Pizzeria,+4+Rue+de+Paris,+94220+Charenton-le-Pont&output=embed&hl=fr"
               width="100%"
               height="100%"
-              style={{ border: 0, display: 'block', minHeight: '380px' }}
+              style={{ border: 0, display: 'block', minHeight: '380px', filter: 'invert(90%) hue-rotate(180deg) brightness(0.9) contrast(1.1)' }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Localisation Da Enzo"
+              title="Da Enzo Pizza — Localisation"
             />
           </motion.div>
         </div>
