@@ -22,6 +22,7 @@ export default function AdminMenuPage() {
     position: 0,
   });
   const [saving, setSaving] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchPizzas();
@@ -120,12 +121,65 @@ export default function AdminMenuPage() {
           <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', marginBottom: '0.25rem' }}>
             Gestion du Menu
           </h1>
-          <p style={{ margin: 0 }}>{pizzas.length} produits au total</p>
+          <p style={{ margin: 0 }}>
+            {activeFilter === 'all'
+              ? `${pizzas.length} produits au total`
+              : `${pizzas.filter((p) => p.category === activeFilter).length} produit(s) — ${PIZZA_CATEGORIES.find((c) => c.slug === activeFilter)?.name}`}
+          </p>
         </div>
         <button onClick={openAdd} className="btn btn-primary">
           + Ajouter un produit
         </button>
       </motion.div>
+
+      {/* Filtres par catégorie */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>
+        <button
+          onClick={() => setActiveFilter('all')}
+          style={{
+            padding: '0.35rem 0.9rem',
+            borderRadius: '20px',
+            border: '1px solid',
+            borderColor: activeFilter === 'all' ? 'var(--color-gold)' : 'var(--color-border)',
+            background: activeFilter === 'all' ? 'rgba(201,168,76,0.15)' : 'transparent',
+            color: activeFilter === 'all' ? 'var(--color-gold)' : 'var(--color-text-secondary)',
+            cursor: 'pointer',
+            fontSize: '0.8rem',
+            fontWeight: activeFilter === 'all' ? 600 : 400,
+            transition: 'all 0.2s',
+          }}
+        >
+          Tous ({pizzas.length})
+        </button>
+        {PIZZA_CATEGORIES.map((cat) => {
+          const count = pizzas.filter((p) => p.category === cat.slug).length;
+          if (count === 0) return null;
+          const isActive = activeFilter === cat.slug;
+          return (
+            <button
+              key={cat.slug}
+              onClick={() => setActiveFilter(cat.slug)}
+              style={{
+                padding: '0.35rem 0.9rem',
+                borderRadius: '20px',
+                border: '1px solid',
+                borderColor: isActive ? 'var(--color-gold)' : 'var(--color-border)',
+                background: isActive ? 'rgba(201,168,76,0.15)' : 'transparent',
+                color: isActive ? 'var(--color-gold)' : 'var(--color-text-secondary)',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: isActive ? 600 : 400,
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+              }}
+            >
+              {cat.icon} {cat.name} ({count})
+            </button>
+          );
+        })}
+      </div>
 
       {/* Table */}
       {loading ? (
@@ -144,7 +198,7 @@ export default function AdminMenuPage() {
               </tr>
             </thead>
             <tbody>
-              {pizzas.map((pizza) => (
+              {pizzas.filter((p) => activeFilter === 'all' || p.category === activeFilter).map((pizza) => (
                 <tr key={pizza.id}>
                   <td style={{ color: 'var(--color-text-muted)' }}>{pizza.position}</td>
                   <td>
