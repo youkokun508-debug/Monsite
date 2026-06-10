@@ -125,8 +125,25 @@ export default function AdminReservationsPage() {
                     </td>
                     <td>{res.phone}</td>
                     <td>{res.guests}</td>
-                    <td style={{ maxWidth: '200px', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                      {res.notes || '—'}
+                    <td style={{ maxWidth: '200px', fontSize: '0.8rem' }}>
+                      {res.notes && (
+                        <span style={{ fontStyle: 'italic' }}>{res.notes}</span>
+                      )}
+                      {res.cancellation_reason && (
+                        <span style={{
+                          display: 'block',
+                          marginTop: res.notes ? '0.35rem' : 0,
+                          color: 'var(--color-error)',
+                          fontSize: '0.75rem',
+                          padding: '0.25rem 0.4rem',
+                          backgroundColor: 'rgba(229, 57, 53, 0.08)',
+                          borderRadius: '2px',
+                          borderLeft: '2px solid var(--color-error)',
+                        }}>
+                          Motif : {res.cancellation_reason}
+                        </span>
+                      )}
+                      {!res.notes && !res.cancellation_reason && '—'}
                     </td>
                     <td>
                       <span

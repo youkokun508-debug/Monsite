@@ -44,6 +44,7 @@ export interface Reservation {
   name: string;
   phone: string;
   notes: string | null;
+  cancellation_reason: string | null;
   status: ReservationStatus;
   created_at: string;
 }
