@@ -26,6 +26,7 @@ export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Menu', href: '/admin/menu', icon: '🍕' },
   { label: 'Réservations', href: '/admin/reservations', icon: '📅' },
   { label: 'Utilisateurs', href: '/admin/utilisateurs', icon: '👥' },
+  { label: 'Fidélité', href: '/admin/fidelite', icon: '⭐' },
   { label: 'Contenu', href: '/admin/contenu', icon: '✏️' },
   { label: 'Notifications', href: '/admin/notifications', icon: '📢' },
 ];
