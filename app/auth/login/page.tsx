@@ -29,7 +29,14 @@ function LoginForm() {
     });
 
     if (signInError) {
-      setError('Email ou mot de passe incorrect.');
+      console.error('Login error:', signInError.message);
+      if (signInError.message.includes('Email not confirmed')) {
+        setError('Votre email n\'a pas été confirmé. Vérifiez votre boîte de réception.');
+      } else if (signInError.message.includes('Invalid login credentials')) {
+        setError('Email ou mot de passe incorrect.');
+      } else {
+        setError(`Erreur de connexion : ${signInError.message}`);
+      }
       setLoading(false);
       return;
     }
