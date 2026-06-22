@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { formatShortDate } from '@/lib/utils';
@@ -8,6 +9,7 @@ import { RESERVATION_STATUSES } from '@/lib/constants';
 import type { Reservation } from '@/lib/types';
 
 export default function UserReservationsPage() {
+  const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
@@ -87,9 +89,17 @@ export default function UserReservationsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: '0.5rem' }}>
-          Mes Réservations
-        </h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', margin: 0 }}>
+            Mes Réservations
+          </h1>
+          <button
+            onClick={() => router.push('/reservation')}
+            className="btn btn-primary"
+          >
+            + Ajouter une réservation
+          </button>
+        </div>
         <p style={{ marginBottom: '2rem' }}>Gérez vos réservations chez Da Enzo.</p>
       </motion.div>
 
