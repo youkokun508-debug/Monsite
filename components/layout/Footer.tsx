@@ -1,6 +1,21 @@
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 
-export function Footer() {
+export async function Footer() {
+  const supabase = await createClient();
+  const { data: rows } = await supabase
+    .from('site_content')
+    .select('key, value')
+    .in('key', ['phone', 'address', 'email']);
+
+  const content: Record<string, string> = {};
+  rows?.forEach((r) => { content[r.key] = r.value; });
+
+  const phone   = content.phone   || '01 49 76 05 60';
+  const address = content.address || '4 Rue de Paris, 94220 Charenton-le-Pont';
+  const email   = content.email   || 'info@daenzopizzeria.fr';
+  const telHref = 'tel:+33' + phone.replace(/^0/, '').replace(/\s/g, '');
+
   const currentYear = new Date().getFullYear();
 
   return (
@@ -116,21 +131,21 @@ export function Footer() {
           >
             <p style={{ margin: 0, display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
               <span style={{ color: 'var(--color-gold)', flexShrink: 0 }}>📍</span>
-              4 Rue de Paris, 94220 Charenton-le-Pont
+              {address}
             </p>
             <a
-              href="tel:+33149760570"
+              href={telHref}
               style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', textDecoration: 'none' }}
             >
               <span style={{ color: 'var(--color-gold)' }}>📞</span>
-              01 49 76 05 70
+              {phone}
             </a>
             <a
-              href="mailto:info@daenzopizzeria.fr"
+              href={`mailto:${email}`}
               style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', textDecoration: 'none' }}
             >
               <span style={{ color: 'var(--color-gold)' }}>✉️</span>
-              info@daenzopizzeria.fr
+              {email}
             </a>
           </div>
         </div>
@@ -193,7 +208,7 @@ export function Footer() {
           © {currentYear} Da Enzo Pizza. Tous droits réservés.
         </p>
         <p style={{ margin: 0 }}>
-          4 Rue de Paris · 94220 Charenton-le-Pont
+          {address}
         </p>
       </div>
     </footer>
