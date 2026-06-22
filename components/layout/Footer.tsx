@@ -1,20 +1,16 @@
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 
-export async function Footer() {
-  const supabase = await createClient();
-  const { data: rows } = await supabase
-    .from('site_content')
-    .select('key, value')
-    .in('key', ['phone', 'address', 'email']);
+interface FooterProps {
+  phone?: string;
+  address?: string;
+  email?: string;
+}
 
-  const content: Record<string, string> = {};
-  rows?.forEach((r) => { content[r.key] = r.value; });
-
-  const phone   = content.phone   || '01 49 76 05 60';
-  const address = content.address || '4 Rue de Paris, 94220 Charenton-le-Pont';
-  const email   = content.email   || 'info@daenzopizzeria.fr';
-  const telHref = 'tel:+33' + phone.replace(/^0/, '').replace(/\s/g, '');
+export function Footer({ phone, address, email }: FooterProps) {
+  const resolvedPhone   = phone   || '01 49 76 05 60';
+  const resolvedAddress = address || '4 Rue de Paris, 94220 Charenton-le-Pont';
+  const resolvedEmail   = email   || 'info@daenzopizzeria.fr';
+  const telHref = 'tel:+33' + resolvedPhone.replace(/^0/, '').replace(/\s/g, '');
 
   const currentYear = new Date().getFullYear();
 
@@ -131,21 +127,21 @@ export async function Footer() {
           >
             <p style={{ margin: 0, display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
               <span style={{ color: 'var(--color-gold)', flexShrink: 0 }}>📍</span>
-              {address}
+              {resolvedAddress}
             </p>
             <a
               href={telHref}
               style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', textDecoration: 'none' }}
             >
               <span style={{ color: 'var(--color-gold)' }}>📞</span>
-              {phone}
+              {resolvedPhone}
             </a>
             <a
-              href={`mailto:${email}`}
+              href={`mailto:${resolvedEmail}`}
               style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', textDecoration: 'none' }}
             >
               <span style={{ color: 'var(--color-gold)' }}>✉️</span>
-              {email}
+              {resolvedEmail}
             </a>
           </div>
         </div>
@@ -208,7 +204,7 @@ export async function Footer() {
           © {currentYear} Da Enzo Pizza. Tous droits réservés.
         </p>
         <p style={{ margin: 0 }}>
-          {address}
+          {resolvedAddress}
         </p>
       </div>
     </footer>

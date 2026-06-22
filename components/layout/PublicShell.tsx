@@ -4,7 +4,14 @@ import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
-export function PublicShell({ children }: { children: React.ReactNode }) {
+interface PublicShellProps {
+  children: React.ReactNode;
+  footerPhone?: string;
+  footerAddress?: string;
+  footerEmail?: string;
+}
+
+export function PublicShell({ children, footerPhone, footerAddress, footerEmail }: PublicShellProps) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith('/admin');
 
@@ -18,7 +25,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
-      {!isAdmin && <Footer />}
+      {!isAdmin && <Footer phone={footerPhone} address={footerAddress} email={footerEmail} />}
     </>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { PublicShell } from "@/components/layout/PublicShell";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: {
@@ -27,15 +28,30 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const { data: rows } = await supabase
+    .from('site_content')
+    .select('key, value')
+    .in('key', ['phone', 'address', 'email']);
+
+  const content: Record<string, string> = {};
+  rows?.forEach((r) => { content[r.key] = r.value; });
+
   return (
     <html lang="fr">
       <body>
-        <PublicShell>{children}</PublicShell>
+        <PublicShell
+          footerPhone={content.phone}
+          footerAddress={content.address}
+          footerEmail={content.email}
+        >
+          {children}
+        </PublicShell>
       </body>
     </html>
   );
