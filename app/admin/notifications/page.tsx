@@ -9,7 +9,6 @@ import type { Notification, NotificationType } from '@/lib/types';
 const TYPE_OPTIONS: { value: NotificationType; label: string; icon: string }[] = [
   { value: 'info', label: 'Information', icon: 'ℹ️' },
   { value: 'promo', label: 'Promotion', icon: '🎉' },
-  { value: 'reservation', label: 'Réservation', icon: '📅' },
 ];
 
 export default function AdminNotificationsPage() {

@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { RestaurantPhoneContext } from '@/components/PhoneLink';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
@@ -16,7 +17,7 @@ export function PublicShell({ children, footerPhone, footerAddress, footerEmail 
   const isAdmin = pathname.startsWith('/admin');
 
   return (
-    <>
+    <RestaurantPhoneContext.Provider value={footerPhone || '01 43 76 05 70'}>
       {!isAdmin && <Header />}
       <main
         style={{
@@ -26,6 +27,6 @@ export function PublicShell({ children, footerPhone, footerAddress, footerEmail 
         {children}
       </main>
       {!isAdmin && <Footer phone={footerPhone} address={footerAddress} email={footerEmail} />}
-    </>
+    </RestaurantPhoneContext.Provider>
   );
 }

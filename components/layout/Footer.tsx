@@ -82,7 +82,6 @@ export function Footer({ phone, address, email }: FooterProps) {
               { label: 'Accueil', href: '/' },
               { label: 'Notre Menu', href: '/menu' },
               { label: 'À Propos', href: '/a-propos' },
-              { label: 'Réservation', href: '/reservation' },
               { label: 'Contact', href: '/contact' },
             ].map((link) => (
               <Link

@@ -2,6 +2,16 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function proxy(request: NextRequest) {
+  const removedRoutes: Record<string, string> = {
+    '/mon-compte/reservations': '/reservation',
+    '/mon-compte/fidelite': '/mon-compte',
+    '/admin/reservations': '/admin',
+    '/admin/fidelite': '/admin',
+  };
+  const oldPath = request.nextUrl.pathname.replace(/\/$/, '');
+  if (removedRoutes[oldPath]) {
+    return NextResponse.redirect(new URL(removedRoutes[oldPath], request.url));
+  }
   let supabaseResponse = NextResponse.next({
     request,
   });

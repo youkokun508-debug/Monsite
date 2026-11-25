@@ -10,23 +10,18 @@ export const PUBLIC_NAV_LINKS: NavLink[] = [
   { label: 'Accueil', href: '/' },
   { label: 'Menu', href: '/menu' },
   { label: 'À propos', href: '/a-propos' },
-  { label: 'Réservation', href: '/reservation' },
   { label: 'Contact', href: '/contact' },
 ];
 
 export const USER_NAV_LINKS: NavLink[] = [
   { label: 'Tableau de bord', href: '/mon-compte', icon: '📊' },
-  { label: 'Mes réservations', href: '/mon-compte/reservations', icon: '📅' },
-  { label: 'Programme fidélité', href: '/mon-compte/fidelite', icon: '⭐' },
   { label: 'Notifications', href: '/mon-compte/notifications', icon: '🔔' },
 ];
 
 export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Dashboard', href: '/admin', icon: '📊' },
   { label: 'Menu', href: '/admin/menu', icon: '🍕' },
-  { label: 'Réservations', href: '/admin/reservations', icon: '📅' },
   { label: 'Utilisateurs', href: '/admin/utilisateurs', icon: '👥' },
-  { label: 'Fidélité', href: '/admin/fidelite', icon: '⭐' },
   { label: 'Contenu', href: '/admin/contenu', icon: '✏️' },
   { label: 'Notifications', href: '/admin/notifications', icon: '📢' },
 ];

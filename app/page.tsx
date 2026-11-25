@@ -3,6 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { PhoneLink } from '@/components/PhoneLink';
 import { createClient } from '@/lib/supabase/client';
 import { PIZZA_CATEGORIES } from '@/lib/constants';
 import { formatPrice } from '@/lib/utils';
@@ -128,9 +129,7 @@ function HeroSection() {
           transition={{ duration: 0.6, delay: 0.8 }}
           style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}
         >
-          <Link href="/reservation" className="btn btn-primary btn-lg">
-            Réserver une table
-          </Link>
+          <PhoneLink className="btn btn-primary btn-lg" />
           <Link href="/menu" className="btn btn-secondary btn-lg">
             Découvrir le menu
           </Link>
@@ -706,7 +705,7 @@ function MapSection() {
   }, []);
 
   return (
-    <section ref={ref} style={{ padding: 'clamp(3rem, 8vw, 5rem) 0', backgroundColor: 'var(--color-bg)' }}>
+    <section id="nous-trouver" ref={ref} style={{ padding: 'clamp(3rem, 8vw, 5rem) 0', backgroundColor: 'var(--color-bg)' }}>
       <div className="section">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -720,18 +719,13 @@ function MapSection() {
           </h2>
         </motion.div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'clamp(220px, 30%, 320px) 1fr',
-          gap: '2.5rem',
-          alignItems: 'stretch',
-        }}>
+        <div className="home-location-grid">
           {/* Infos pratiques */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="card"
+            className="card home-location-info"
             style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}
           >
             <div>
@@ -755,26 +749,72 @@ function MapSection() {
             </div>
           </motion.div>
 
-          {/* Carte Google Maps — même style sombre que la page Contact */}
+          {/* Carte lisible, carrée sur mobile */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.25 }}
-            style={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--color-border)', minHeight: '380px' }}
+            className="home-location-map"
           >
+            <div className="home-location-frame">
             <iframe
               src="https://maps.google.com/maps?q=Da+Enzo+Pizzeria,+4+Rue+de+Paris,+94220+Charenton-le-Pont&output=embed&hl=fr"
               width="100%"
               height="100%"
-              style={{ border: 0, display: 'block', minHeight: '380px', filter: 'invert(90%) hue-rotate(180deg) brightness(0.9) contrast(1.1)' }}
+              style={{ border: 0, display: 'block', width: '100%', height: '100%' }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="Da Enzo Pizza — Localisation"
             />
+            </div>
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent('Da Enzo Pizzeria, ' + contact.address)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary home-location-directions"
+            >
+              Itinéraire sur Google Maps ↗
+            </a>
           </motion.div>
         </div>
       </div>
+      <style jsx global>{`
+        .home-location-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          gap: 1.5rem;
+          align-items: start;
+        }
+        .home-location-info, .home-location-map { min-width: 0; }
+        .home-location-map { order: -1; }
+        .home-location-frame {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 1;
+          overflow: hidden;
+          border: 1px solid var(--color-border);
+          border-radius: 8px;
+          background: var(--color-surface);
+        }
+        .home-location-frame iframe { position: absolute; inset: 0; }
+        .home-location-directions {
+          display: flex;
+          width: 100%;
+          margin-top: 1rem;
+          min-height: 48px;
+          text-align: center;
+          white-space: normal;
+        }
+        @media (min-width: 768px) {
+          .home-location-grid {
+            grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+            gap: 2rem;
+          }
+          .home-location-map { order: 0; }
+          .home-location-frame { aspect-ratio: 4 / 3; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -814,12 +854,10 @@ function CTASection() {
               lineHeight: 1.7,
             }}
           >
-            Réservez en quelques clics et laissez-nous vous offrir une expérience
+            Appelez-nous pour réserver votre table et profitez d’une expérience
             gastronomique inoubliable.
           </p>
-          <Link href="/reservation" className="btn btn-primary btn-lg">
-            Réserver maintenant
-          </Link>
+          <PhoneLink className="btn btn-primary btn-lg" />
         </motion.div>
       </div>
     </section>

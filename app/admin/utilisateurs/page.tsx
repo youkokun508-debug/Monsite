@@ -78,7 +78,6 @@ export default function AdminUsersPage() {
                 <th>Nom</th>
                 <th>Email</th>
                 <th>Inscription</th>
-                <th>Points fidélité</th>
                 <th>Statut</th>
                 <th>Action</th>
               </tr>
@@ -117,11 +116,6 @@ export default function AdminUsersPage() {
                     </td>
                     <td>{user.email}</td>
                     <td>{formatShortDate(user.created_at)}</td>
-                    <td>
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--color-gold)' }}>
-                        {user.points}
-                      </span>
-                    </td>
                     <td>
                       <span
                         className="badge"

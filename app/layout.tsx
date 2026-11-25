@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | Da Enzo Pizza",
   },
   description:
-    "Da Enzo, pizzeria artisanale à Charenton-le-Pont. Pizzas cuites au feu de bois, ingrédients importés d'Italie. Réservez votre table en ligne.",
+    "Da Enzo, pizzeria artisanale à Charenton-le-Pont. Pizzas cuites au feu de bois, ingrédients importés d'Italie. Réservations uniquement par téléphone.",
   keywords: [
     "pizzeria",
     "pizza artisanale",
