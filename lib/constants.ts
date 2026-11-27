@@ -24,6 +24,7 @@ export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Utilisateurs', href: '/admin/utilisateurs', icon: '👥' },
   { label: 'Contenu', href: '/admin/contenu', icon: '✏️' },
   { label: 'Notifications', href: '/admin/notifications', icon: '📢' },
+  { label: 'Roue (flyer)', href: '/admin/roue', icon: '🎡' },
 ];
 
 // ---------- Reservation ----------
