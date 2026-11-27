@@ -5,11 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
+import { safeRedirectPath } from '@/lib/safe-redirect';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '';
+  const redirect = safeRedirectPath(searchParams.get('redirect'), '');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
