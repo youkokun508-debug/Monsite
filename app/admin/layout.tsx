@@ -22,6 +22,7 @@ export default function AdminLayout({
 
   return (
     <div
+      className="admin-shell"
       style={{
         display: 'flex',
         minHeight: '100vh',
@@ -62,20 +63,21 @@ export default function AdminLayout({
           Da Enzo
         </Link>
         <span
-          className="badge badge-gold"
+          className="badge badge-gold admin-badge"
           style={{ alignSelf: 'flex-start', marginBottom: '2rem' }}
         >
           Administration
         </span>
 
         {/* Navigation */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
+        <nav className="admin-nav" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
           {ADMIN_NAV_LINKS.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
+                className={`admin-nav-link${isActive ? ' is-active' : ''}`}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -98,7 +100,7 @@ export default function AdminLayout({
         </nav>
 
         {/* Bottom */}
-        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem', marginTop: '1rem' }}>
+        <div className="admin-bottom" style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem', marginTop: '1rem' }}>
           <Link
             href="/"
             style={{
@@ -112,7 +114,7 @@ export default function AdminLayout({
               marginBottom: '0.5rem',
             }}
           >
-            🌐 Voir le site
+            <span aria-hidden>🌐</span> <span className="admin-label">Voir le site</span>
           </Link>
           <button
             onClick={handleLogout}
@@ -131,7 +133,7 @@ export default function AdminLayout({
               textAlign: 'left',
             }}
           >
-            🚪 Déconnexion
+            <span aria-hidden>🚪</span> <span className="admin-label">Déconnexion</span>
           </button>
         </div>
       </aside>
@@ -151,12 +153,81 @@ export default function AdminLayout({
 
       <style jsx global>{`
         @media (max-width: 768px) {
+          /* Sur téléphone : barre en haut + menu horizontal qui défile */
+          .admin-shell {
+            flex-direction: column !important;
+          }
           .admin-sidebar {
             width: 100% !important;
-            position: relative !important;
+            position: sticky !important;
+            top: 0 !important;
+            bottom: auto !important;
+            padding: 0.6rem 0.75rem 0.5rem !important;
+            border-right: none !important;
+            border-bottom: 1px solid var(--color-border) !important;
+            display: grid !important;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            column-gap: 0.6rem;
+            overflow: visible !important;
+            backdrop-filter: blur(8px);
+          }
+          .admin-sidebar > a:first-child {
+            margin-bottom: 0 !important;
+            font-size: 1.25rem !important;
+          }
+          .admin-badge {
+            margin-bottom: 0 !important;
+            align-self: center !important;
+            justify-self: start;
+            font-size: 0.65rem;
+          }
+          .admin-bottom {
+            border-top: none !important;
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+            display: flex;
+            gap: 0.25rem;
+          }
+          .admin-bottom a,
+          .admin-bottom button {
+            padding: 0.4rem 0.5rem !important;
+            margin: 0 !important;
+            width: auto !important;
+            font-size: 1.1rem !important;
+          }
+          .admin-label {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+          }
+          .admin-nav {
+            grid-column: 1 / -1;
+            flex-direction: row !important;
+            overflow-x: auto;
+            gap: 0.4rem !important;
+            margin-top: 0.6rem;
+            padding-bottom: 0.25rem;
+            scrollbar-width: none;
+          }
+          .admin-nav::-webkit-scrollbar { display: none; }
+          .admin-nav-link {
+            flex: 0 0 auto;
+            padding: 0.5rem 0.85rem !important;
+            border-left: none !important;
+            border: 1px solid var(--color-border) !important;
+            border-radius: 999px !important;
+            font-size: 0.85rem !important;
+            white-space: nowrap;
+          }
+          .admin-nav-link.is-active {
+            border-color: var(--color-gold) !important;
           }
           .admin-main {
             margin-left: 0 !important;
+            padding: 1.25rem 1rem 2.5rem !important;
           }
         }
       `}</style>

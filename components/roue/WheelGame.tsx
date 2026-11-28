@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
+import { Confetti } from './Confetti';
 
 export interface WheelPrize {
   key: string;
@@ -68,6 +70,8 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
   const [rotation, setRotation] = useState(0);
   const [result, setResult] = useState<SpinResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const seg = 360 / prizes.length;
   const total = useMemo(() => prizes.reduce((s, p) => s + Number(p.weight), 0), [prizes]);
@@ -88,6 +92,28 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
     }
   }, []);
 
+  function finishSpin() {
+    setPhase('result');
+    setCelebrate((n) => n + 1);
+    try {
+      navigator.vibrate?.([60, 40, 120]);
+    } catch {
+      /* ignore */
+    }
+    setTimeout(() => document.getElementById('roue-resultat')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+  }
+
+  async function copyCode() {
+    if (!result) return;
+    try {
+      await navigator.clipboard.writeText(result.code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
+
   // Mode test admin : on oublie le tour précédent et on repart avec un nouvel identifiant
   function replayAsAdmin() {
     try {
@@ -98,6 +124,7 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
     }
     setResult(null);
     setError(null);
+    setCopied(false);
     setPhase('ready');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -141,7 +168,30 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
   }
 
   return (
-    <section className="section" style={{ maxWidth: 560, textAlign: 'center' }}>
+    <section className="section roue-page" style={{ maxWidth: 560, textAlign: 'center' }}>
+      <Confetti fire={celebrate > 0} key={celebrate} />
+      <style jsx global>{`
+        @keyframes roue-tick {
+          0%, 100% { transform: translateX(-50%) rotate(0deg); }
+          50% { transform: translateX(-50%) rotate(-14deg); }
+        }
+        .roue-pointer.is-spinning { animation: roue-tick 0.12s ease-in-out infinite; transform-origin: 50% 20%; }
+        .roue-btn { width: min(100%, 340px); }
+        @media (max-width: 640px) {
+          .roue-page { padding-top: 1.75rem !important; padding-bottom: 2.5rem !important; }
+          .roue-page h1 { margin-bottom: 0.5rem !important; }
+          .roue-intro { font-size: 0.95rem; margin-bottom: 1.4rem !important; }
+          .roue-btn { padding-top: 1rem !important; padding-bottom: 1rem !important; font-size: 1rem !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .roue-pointer.is-spinning { animation: none; }
+        }
+      `}</style>
+      {isAdmin && (
+        <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
+          <Link href="/admin/roue" className="btn btn-ghost btn-sm">← Retour à l&apos;admin</Link>
+        </div>
+      )}
       <p className="section-subtitle">Réservé aux clients du flyer</p>
       <h1
         style={{
@@ -155,7 +205,7 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
         Tentez votre <em style={{ color: 'var(--color-gold-light)' }}>chance</em>
       </h1>
       <div className="separator-ornament" style={{ margin: '0 auto 1.25rem' }} />
-      <p style={{ color: 'var(--color-text-secondary)', marginBottom: '2rem', lineHeight: 1.6 }}>
+      <p className="roue-intro" style={{ color: 'var(--color-text-secondary)', marginBottom: '2rem', lineHeight: 1.6 }}>
         Tournez la roue et repartez avec un cadeau à utiliser lors de votre prochain repas chez Da Enzo.
         <br />
         <span style={{ color: 'var(--color-gold)' }}>À tous les coups, on gagne.</span>
@@ -163,18 +213,19 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
 
       {phase !== 'result' && (
         <>
-          <div style={{ position: 'relative', width: 'min(86vw, 340px)', margin: '0 auto' }}>
+          <div style={{ position: 'relative', width: 'min(86vw, 340px, 52svh)', margin: '0 auto' }}>
             {/* Pointeur */}
             <svg
               viewBox="0 0 40 44"
               aria-hidden
+              className={`roue-pointer${phase === 'spinning' ? ' is-spinning' : ''}`}
               style={{ position: 'absolute', top: -14, left: '50%', width: 34, transform: 'translateX(-50%)', zIndex: 2, filter: 'drop-shadow(0 3px 6px rgba(0,0,0,.6))' }}
             >
               <path d="M20 42 L4 8 Q20 -2 36 8 Z" fill="var(--color-gold)" stroke="#6B5520" strokeWidth="1.5" />
             </svg>
 
             <div
-              onTransitionEnd={() => phase === 'spinning' && setPhase('result')}
+              onTransitionEnd={() => phase === 'spinning' && finishSpin()}
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transition: phase === 'spinning' ? 'transform 5.5s cubic-bezier(0.15, 0.7, 0.12, 1)' : 'none',
@@ -249,10 +300,10 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
           </div>
 
           <button
-            className="btn btn-primary btn-lg"
+            className="btn btn-primary btn-lg roue-btn"
             onClick={spin}
             disabled={phase !== 'ready'}
-            style={{ marginTop: '2.25rem', minWidth: 240, opacity: phase === 'ready' ? 1 : 0.6 }}
+            style={{ marginTop: '1.75rem', opacity: phase === 'ready' ? 1 : 0.6 }}
           >
             {phase === 'spinning' ? 'La roue tourne…' : 'Tourner la roue'}
           </button>
@@ -265,7 +316,7 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
       )}
 
       {phase === 'result' && result && (
-        <motion.div initial={{ opacity: 0, y: 20, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.6 }}>
+        <motion.div id="roue-resultat" initial={{ opacity: 0, y: 20, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.6 }}>
           <div className="card" style={{ borderColor: 'var(--color-border-strong)', padding: '2rem 1.5rem', boxShadow: 'var(--shadow-gold)' }}>
             {result.is_test && (
               <span className="badge badge-warning" style={{ marginBottom: '0.75rem', display: 'inline-block' }}>
@@ -293,6 +344,11 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
             >
               {result.code}
             </div>
+            <div>
+              <button className="btn btn-ghost btn-sm" onClick={copyCode} style={{ marginBottom: '0.75rem' }}>
+                {copied ? '✓ Code copié' : 'Copier le code'}
+              </button>
+            </div>
             {result.redeemed ? (
               <p style={{ color: 'var(--color-text-secondary)' }}>Ce code a déjà été utilisé. Merci de votre visite !</p>
             ) : (
@@ -315,7 +371,7 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
               <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginBottom: '1.1rem', lineHeight: 1.6 }}>
                 Votre avis aide beaucoup un restaurant de quartier comme le nôtre.
               </p>
-              <a className="btn btn-secondary" href={reviewUrl} target="_blank" rel="noopener noreferrer">
+              <a className="btn btn-secondary roue-btn" href={reviewUrl} target="_blank" rel="noopener noreferrer">
                 Laisser un avis sur Google
               </a>
               <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginTop: '0.9rem' }}>
@@ -342,13 +398,19 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin 
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', margin: '0.4rem 0 0.9rem', lineHeight: 1.5 }}>
             Vous pouvez rejouer autant de fois que vous voulez. Vos tours sont marqués « test » et ne comptent pas dans les statistiques. Les clients, eux, n&apos;ont qu&apos;un seul tour.
           </p>
-          <button className="btn btn-secondary" onClick={replayAsAdmin} disabled={phase === 'spinning'}>
+          <button className="btn btn-secondary roue-btn" onClick={replayAsAdmin} disabled={phase === 'spinning'}>
             ↻ Rejouer (test)
           </button>
         </div>
       )}
 
-      <details style={{ marginTop: '2.5rem', textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
+      <nav aria-label="Continuer sur le site" style={{ marginTop: '2rem', display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center' }}>
+        <Link href="/menu" className="btn btn-primary roue-btn">Découvrir la carte</Link>
+        <Link href="/" className="btn btn-ghost">Accueil</Link>
+        <Link href="/contact" className="btn btn-ghost">Nous trouver</Link>
+      </nav>
+
+      <details style={{ marginTop: '2rem', textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
         <summary style={{ cursor: 'pointer', color: 'var(--color-gold-muted)', textAlign: 'center', listStyle: 'none' }}>
           Règlement et chances de gain
         </summary>

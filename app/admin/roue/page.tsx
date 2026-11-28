@@ -93,6 +93,8 @@ export default function AdminRouePage() {
     return spins.filter((s) => s.code.replace('DE-', '').includes(q));
   }, [spins, search]);
 
+  const exactMatch = filtered.length === 1 && search.trim().replace(/^de-?/i, '').length >= 4 ? filtered[0] : null;
+
   const stats = useMemo(() => {
     const real = spins.filter((s) => !s.is_test);
     const used = real.filter((s) => s.redeemed_at).length;
@@ -111,9 +113,22 @@ export default function AdminRouePage() {
 
   return (
     <div>
-      <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '2.2rem', marginBottom: '0.25rem' }}>
+      <style jsx global>{`
+        .roue-cards { display: none; }
+        @media (max-width: 640px) {
+          .roue-cards { display: block; }
+          .roue-table { display: none; }
+          .roue-admin-title { font-size: 1.8rem !important; }
+        }
+      `}</style>
+      <h1 className="roue-admin-title" style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '2.2rem', marginBottom: '0.25rem' }}>
         Roue de la chance
       </h1>
+      {config && (
+        <a href={`/roue?k=${config.access_key}`} className="btn btn-secondary btn-sm" style={{ marginBottom: '1rem' }}>
+          🎡 Ouvrir la roue (démo)
+        </a>
+      )}
       <p style={{ color: 'var(--color-text-secondary)', marginBottom: '2rem' }}>
         Page secrète accessible uniquement via le QR code du flyer. Validez ici les codes présentés en caisse.
       </p>
@@ -127,9 +142,32 @@ export default function AdminRouePage() {
           placeholder="ex. DE-7K3P"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ fontSize: '1.3rem', letterSpacing: '0.12em', textTransform: 'uppercase', maxWidth: 320 }}
+          style={{ fontSize: '1.3rem', letterSpacing: '0.12em', textTransform: 'uppercase', maxWidth: 360 }}
           autoComplete="off"
+          autoCapitalize="characters"
+          spellCheck={false}
+          enterKeyHint="search"
         />
+        {exactMatch && (() => {
+          const st = status(exactMatch);
+          const canRedeem = !exactMatch.redeemed_at && new Date(exactMatch.expires_at) >= new Date();
+          return (
+            <div style={{ marginTop: '1rem', padding: '1.1rem', border: '1px solid var(--color-border-strong)', borderRadius: 4, background: 'rgba(201,168,76,.05)' }}>
+              <p style={{ fontFamily: 'monospace', letterSpacing: '0.15em', color: 'var(--color-gold)', fontSize: '1.2rem' }}>{exactMatch.code}</p>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.7rem', lineHeight: 1.15, margin: '0.25rem 0 0.5rem' }}>{exactMatch.prize_label}</p>
+              <p style={{ marginBottom: '0.9rem' }}>
+                <span className={st.cls}>{st.label}</span>
+                {exactMatch.is_test && <span className="badge badge-warning" style={{ marginLeft: 6 }}>Test</span>}
+                <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', marginLeft: 8 }}>expire le {fmt(exactMatch.expires_at)}</span>
+              </p>
+              {canRedeem && (
+                <button className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={busy === exactMatch.id} onClick={() => redeem(exactMatch)}>
+                  ✓ Valider ce code
+                </button>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Stats */}
@@ -151,7 +189,35 @@ export default function AdminRouePage() {
       </div>
 
       {/* Codes */}
-      <div className="card" style={{ overflowX: 'auto', marginBottom: '1.5rem' }}>
+      <div className="roue-cards" style={{ marginBottom: '1.5rem' }}>
+        {filtered.length === 0 && (
+          <p className="card" style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+            {search ? 'Aucun code ne correspond.' : 'Aucun tour joué pour le moment.'}
+          </p>
+        )}
+        {filtered.slice(0, 50).map((s) => {
+          const st = status(s);
+          const canRedeem = !s.redeemed_at && new Date(s.expires_at) >= new Date();
+          return (
+            <div key={s.id} className="card" style={{ padding: '0.9rem 1rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontFamily: 'monospace', letterSpacing: '0.1em', color: 'var(--color-gold)' }}>{s.code}</p>
+                <p style={{ fontSize: '0.95rem' }}>{s.prize_label}</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: 4 }}>
+                  <span className={st.cls}>{st.label}</span>
+                  {s.is_test && <span className="badge badge-warning" style={{ marginLeft: 6 }}>Test</span>}
+                  <span style={{ marginLeft: 6 }}>joué le {fmt(s.created_at)}</span>
+                </p>
+              </div>
+              {canRedeem && (
+                <button className="btn btn-primary btn-sm" disabled={busy === s.id} onClick={() => redeem(s)}>Valider</button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="card roue-table" style={{ overflowX: 'auto', marginBottom: '1.5rem' }}>
         <table className="admin-table" style={{ width: '100%' }}>
           <thead>
             <tr><th>Code</th><th>Gain</th><th>Joué le</th><th>Expire le</th><th>Statut</th><th /></tr>
@@ -216,7 +282,10 @@ export default function AdminRouePage() {
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
             À ne pas diffuser en dehors du flyer. Code valable {config?.validity_days} jours après le tour.
           </p>
-          <code style={{ wordBreak: 'break-all', color: 'var(--color-gold-light)' }}>{qrUrl}</code>
+          <code style={{ wordBreak: 'break-all', color: 'var(--color-gold-light)', display: 'block', marginBottom: '1rem' }}>{qrUrl}</code>
+          <a href={qrUrl.replace(origin, '')} className="btn btn-primary" style={{ width: '100%', maxWidth: 340 }}>
+            🎡 Ouvrir la roue (démo)
+          </a>
         </div>
       )}
     </div>
