@@ -11,6 +11,7 @@ interface Spin {
   created_at: string;
   expires_at: string;
   redeemed_at: string | null;
+  is_test: boolean;
 }
 
 interface WheelConfig {
@@ -48,7 +49,7 @@ export default function AdminRouePage() {
     const supabase = createClient();
     const [{ data: cfg }, { data: rows }] = await Promise.all([
       supabase.from('wheel_config').select('access_key, active, validity_days, google_review_url, prizes').eq('id', 1).single(),
-      supabase.from('wheel_spins').select('id, code, prize_key, prize_label, created_at, expires_at, redeemed_at').order('created_at', { ascending: false }).limit(500),
+      supabase.from('wheel_spins').select('id, code, prize_key, prize_label, created_at, expires_at, redeemed_at, is_test').order('created_at', { ascending: false }).limit(500),
     ]);
     if (cfg) setConfig(cfg as WheelConfig);
     if (rows) setSpins(rows as Spin[]);
@@ -70,6 +71,15 @@ export default function AdminRouePage() {
     load();
   }
 
+  async function deleteTests() {
+    const n = spins.filter((s) => s.is_test).length;
+    if (!n || !confirm(`Supprimer les ${n} tour(s) de test ? Les vrais tours des clients ne sont pas touchés.`)) return;
+    const supabase = createClient();
+    const { error } = await supabase.from('wheel_spins').delete().eq('is_test', true);
+    if (error) alert('Suppression impossible. Réessayez.');
+    load();
+  }
+
   async function toggleActive() {
     if (!config) return;
     const supabase = createClient();
@@ -84,14 +94,15 @@ export default function AdminRouePage() {
   }, [spins, search]);
 
   const stats = useMemo(() => {
-    const used = spins.filter((s) => s.redeemed_at).length;
+    const real = spins.filter((s) => !s.is_test);
+    const used = real.filter((s) => s.redeemed_at).length;
     const byPrize: Record<string, { label: string; total: number; used: number }> = {};
-    for (const s of spins) {
+    for (const s of real) {
       byPrize[s.prize_key] ??= { label: s.prize_label, total: 0, used: 0 };
       byPrize[s.prize_key].total++;
       if (s.redeemed_at) byPrize[s.prize_key].used++;
     }
-    return { total: spins.length, used, byPrize };
+    return { total: real.length, used, byPrize, tests: spins.length - real.length };
   }, [spins]);
 
   const qrUrl = config && origin ? `${origin}/roue?k=${config.access_key}` : '';
@@ -132,6 +143,11 @@ export default function AdminRouePage() {
           </p>
           <button className="btn btn-ghost btn-sm" onClick={toggleActive}>{config?.active ? 'Désactiver' : 'Réactiver'}</button>
         </div>
+        <div className="card">
+          <p className="text-secondary" style={{ fontSize: '0.8rem' }}>Tours de test (admin)</p>
+          <p style={{ fontSize: '1.8rem', color: 'var(--color-gold)', margin: '0 0 0.4rem' }}>{stats.tests}</p>
+          {stats.tests > 0 && <button className="btn btn-ghost btn-sm" onClick={deleteTests}>Effacer les tests</button>}
+        </div>
       </div>
 
       {/* Codes */}
@@ -155,7 +171,10 @@ export default function AdminRouePage() {
                   <td>{s.prize_label}</td>
                   <td>{fmt(s.created_at)}</td>
                   <td>{fmt(s.expires_at)}</td>
-                  <td><span className={st.cls}>{st.label}</span></td>
+                  <td>
+                    <span className={st.cls}>{st.label}</span>
+                    {s.is_test && <span className="badge badge-warning" style={{ marginLeft: 6 }}>Test</span>}
+                  </td>
                   <td>
                     {canRedeem && (
                       <button className="btn btn-primary btn-sm" disabled={busy === s.id} onClick={() => redeem(s)}>

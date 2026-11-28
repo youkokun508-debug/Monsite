@@ -18,6 +18,7 @@ interface SpinResult {
   expires_at: string;
   redeemed: boolean;
   already: boolean;
+  is_test?: boolean;
 }
 
 interface WheelGameProps {
@@ -25,6 +26,7 @@ interface WheelGameProps {
   prizes: WheelPrize[];
   validityDays: number;
   reviewUrl: string | null;
+  isAdmin?: boolean;
 }
 
 const DEVICE_KEY = 'daenzo_roue_device';
@@ -39,10 +41,14 @@ const ERRORS: Record<string, string> = {
   default: 'Une erreur est survenue. Vérifiez votre connexion et réessayez.',
 };
 
+function newDeviceId(): string {
+  return (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`).replace(/[^a-zA-Z0-9-]/g, '');
+}
+
 function getDeviceId(): string {
   let id = localStorage.getItem(DEVICE_KEY);
   if (!id || id.length < 16) {
-    id = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`).replace(/[^a-zA-Z0-9-]/g, '');
+    id = newDeviceId();
     localStorage.setItem(DEVICE_KEY, id);
   }
   return id;
@@ -57,7 +63,7 @@ function polar(angleFromTop: number, radius: number) {
   return { x: C + radius * Math.cos(a), y: C + radius * Math.sin(a) };
 }
 
-export function WheelGame({ accessKey, prizes, validityDays, reviewUrl }: WheelGameProps) {
+export function WheelGame({ accessKey, prizes, validityDays, reviewUrl, isAdmin = false }: WheelGameProps) {
   const [phase, setPhase] = useState<'ready' | 'spinning' | 'result'>('ready');
   const [rotation, setRotation] = useState(0);
   const [result, setResult] = useState<SpinResult | null>(null);
@@ -81,6 +87,20 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl }: WheelG
       /* stockage indisponible : on laisse jouer, la base limite de toute façon */
     }
   }, []);
+
+  // Mode test admin : on oublie le tour précédent et on repart avec un nouvel identifiant
+  function replayAsAdmin() {
+    try {
+      localStorage.removeItem(RESULT_KEY);
+      localStorage.setItem(DEVICE_KEY, newDeviceId());
+    } catch {
+      /* ignore */
+    }
+    setResult(null);
+    setError(null);
+    setPhase('ready');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   async function spin() {
     if (phase !== 'ready') return;
@@ -247,6 +267,11 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl }: WheelG
       {phase === 'result' && result && (
         <motion.div initial={{ opacity: 0, y: 20, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.6 }}>
           <div className="card" style={{ borderColor: 'var(--color-border-strong)', padding: '2rem 1.5rem', boxShadow: 'var(--shadow-gold)' }}>
+            {result.is_test && (
+              <span className="badge badge-warning" style={{ marginBottom: '0.75rem', display: 'inline-block' }}>
+                Tour de test (admin)
+              </span>
+            )}
             <p className="section-subtitle" style={{ marginBottom: '0.75rem' }}>
               {result.already ? 'Votre gain' : 'Félicitations !'}
             </p>
@@ -299,6 +324,28 @@ export function WheelGame({ accessKey, prizes, validityDays, reviewUrl }: WheelG
             </div>
           )}
         </motion.div>
+      )}
+
+      {isAdmin && (
+        <div
+          style={{
+            marginTop: '2rem',
+            padding: '1rem 1.25rem',
+            border: '1px dashed var(--color-gold-muted)',
+            borderRadius: 4,
+            background: 'rgba(201,168,76,.05)',
+          }}
+        >
+          <p style={{ fontFamily: 'var(--font-accent)', letterSpacing: '0.2em', fontSize: '0.75rem', color: 'var(--color-gold)', textTransform: 'uppercase' }}>
+            Mode admin · démo
+          </p>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', margin: '0.4rem 0 0.9rem', lineHeight: 1.5 }}>
+            Vous pouvez rejouer autant de fois que vous voulez. Vos tours sont marqués « test » et ne comptent pas dans les statistiques. Les clients, eux, n&apos;ont qu&apos;un seul tour.
+          </p>
+          <button className="btn btn-secondary" onClick={replayAsAdmin} disabled={phase === 'spinning'}>
+            ↻ Rejouer (test)
+          </button>
+        </div>
       )}
 
       <details style={{ marginTop: '2.5rem', textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
